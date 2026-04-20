@@ -7,6 +7,7 @@ class UsuarioOut(BaseModel):
     email: EmailStr
     activo: bool
     creado_en: datetime
+    foto: str | None = None
     model_config = {"from_attributes": True}
 
 class ConfiguracionOut(BaseModel):
