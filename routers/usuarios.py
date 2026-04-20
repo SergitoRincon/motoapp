@@ -12,7 +12,7 @@ router = APIRouter(prefix="/usuarios", tags=["Usuarios"])
 
 class PerfilUpdate(BaseModel):
     nombre: str | None = None
-    foto: str | None = None
+    foto: str | None = None   # base64
 
 
 @router.get("/me", response_model=UsuarioOut)
@@ -28,6 +28,8 @@ async def update_perfil(
 ):
     if body.nombre:
         current_user.nombre = body.nombre
+    if body.foto is not None:
+        current_user.foto = body.foto
     await db.commit()
     await db.refresh(current_user)
     return {"ok": True, "nombre": current_user.nombre}
