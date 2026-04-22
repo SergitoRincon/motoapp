@@ -130,6 +130,20 @@ class HistorialEvento(Base):
 
 
 # ══════════════════════════════════════════════════
+# TOKENS DE RESET DE CONTRASEÑA
+# ══════════════════════════════════════════════════
+class PasswordResetToken(Base):
+    __tablename__ = "password_reset_tokens"
+
+    id:         Mapped[int]      = mapped_column(Integer, primary_key=True, index=True)
+    usuario_id: Mapped[int]      = mapped_column(ForeignKey("usuarios.id"), index=True)
+    token:      Mapped[str]      = mapped_column(String(64), unique=True, index=True)
+    usado:      Mapped[bool]     = mapped_column(Boolean, default=False)
+    expira_en:  Mapped[datetime] = mapped_column(DateTime)
+    creado_en:  Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+# ══════════════════════════════════════════════════
 # CONFIGURACIÓN POR USUARIO
 # ══════════════════════════════════════════════════
 class ConfiguracionUsuario(Base):
