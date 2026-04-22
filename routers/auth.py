@@ -1,11 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from pydantic import BaseModel
 from database.connection import get_db
 from database.models import Usuario, ConfiguracionUsuario
 from schemas.auth import RegistroRequest, LoginRequest, TokenResponse, RefreshRequest
 from services.auth_service import (hash_password, verify_password,
                                     create_access_token, create_refresh_token, decode_token)
+from middleware.auth_middleware import get_current_user
 
 router = APIRouter(prefix="/auth", tags=["Autenticación"])
 
@@ -48,3 +50,20 @@ async def refresh(body: RefreshRequest, db: AsyncSession = Depends(get_db)):
     if not usuario or not usuario.activo:
         raise HTTPException(401, "Usuario no válido")
     return _tokens(usuario.id)
+
+
+class CambiarPasswordRequest(BaseModel):
+    password_actual: str
+    password_nuevo: str
+
+@router.patch("/cambiar-password")
+async def cambiar_password(
+    body: CambiarPasswordRequest,
+    current_user: Usuario = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    if not verify_password(body.password_actual, current_user.hashed_password):
+        raise HTTPException(400, "La contraseña actual es incorrecta")
+    current_user.hashed_password = hash_password(body.password_nuevo)
+    await db.commit()
+    return {"ok": True, "mensaje": "Contraseña actualizada correctamente"}

@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database.config import settings
 from database.connection import create_tables
-from routers import auth, usuarios, vehiculos, mantenimiento
+from routers import auth, usuarios_backend, vehiculos, mantenimiento
 
 # Configuración de logs para ver qué pasa en Render
 logging.basicConfig(level=logging.INFO,
